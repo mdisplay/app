@@ -61,6 +61,12 @@ IqamahTime.fromRaw = function(raw) {
   return new IqamahTime(raw.minutes, raw.hours, raw.absolute);
 }
 
+// class AppUpdater {
+//   constructor() {
+
+//   }
+// }
+
 class App {
   constructor() {
     this.lang = 'ta';
@@ -85,6 +91,13 @@ class App {
         Magrib: new IqamahTime(10),
         Isha: new IqamahTime(15),
       },
+      appUdate: {
+        enabled: false,
+        checking: false,
+        updated: false,
+        updating: false,
+        error: false,
+      }
     };
     this.isInitial = true;
     this.beforeSeconds = 5*60;
@@ -95,6 +108,42 @@ class App {
     this.afterSeconds = 2*60;
     this.data.bgVersion = '3';
   }
+
+  checkForUpdates() {
+    if(window.codePush === undefined){
+      console.log('codePush not available');
+      return;
+    }
+    this.data.appUdate.enabled = true;
+    // if(this.data.appUdate.updated) {
+    //   return;
+    // }
+    this.data.appUdate.error = false;
+    this.data.appUdate.checking = true;
+    this.data.appUdate.updated = false;
+    this.data.appUdate.updating = false;
+    window.codePush.checkForUpdate((update) => {
+      this.data.appUdate.error = false;
+      this.data.appUdate.checking = false;
+      this.data.appUdate.updating = false;
+      this.data.appUdate.updated = false;
+      if (!update) {
+        // alert("The app is up to date.");
+        this.data.appUdate.updated = true;
+      } else {
+        this.data.appUdate.updating = true;
+        window.askAndAutoUpdate();
+        // alert("An update is available! Should we download it?");
+        // window.codePush.restartApplication();
+      }
+    }, (error) => {
+      this.data.appUdate.checking = false;
+      this.data.appUdate.updating = false;
+      this.data.appUdate.updated = false;
+      this.data.appUdate.error = error;
+    });
+  }
+
   getRandomNumber(min, max) {
     return Math.floor(min + (Math.random() * (max - min + 1)));
   }
@@ -368,6 +417,7 @@ class App {
   }
   openSettings() {
     this.data.settingsMode = true;
+    this.checkForUpdates();
   }
   closeSettings() {
     this.data.settingsMode = false;

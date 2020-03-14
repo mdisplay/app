@@ -6,9 +6,9 @@
   <title>MDisplay Live</title>
   <link rel="shortcut icon" href="assets/images/favicon.png">
   <link rel="icon" type="image/png" href="assets/images/favicon.png">
-  <link rel="stylesheet" type="text/css" href="assets/vendors/reboot.css?v=1.6.3-32">
-  <link rel="stylesheet" type="text/css" href="assets/css/app.css?v=1.6.3-32">
-  <link rel="stylesheet" type="text/css" href="assets/css/theme-default.css?v=1.6.3-32">
+  <link rel="stylesheet" type="text/css" href="assets/vendors/reboot.css?v=1.6.12-42">
+  <link rel="stylesheet" type="text/css" href="assets/css/app.css?v=1.6.12-42">
+  <link rel="stylesheet" type="text/css" href="assets/css/theme-default.css?v=1.6.12-42">
 </head>
 <body>
   <div id="app" :class="[{'is-active': currentPrayer, 'is-waiting': currentPrayerWaiting, 'is-before': currentPrayerBefore, 'is-after': currentPrayerAfter}, 'active-prayer-info-' + prayerInfo]">
@@ -29,6 +29,16 @@
           <div class="configured-info">
             <span class="configured" v-if="iqamahTimesConfigured">Configured</span>
             <span class="not-configured" v-else>Not Configured</span>
+          </div>
+          <div class="update-info" v-if="appUdate.enabled">
+            AUTO UPDATE: 
+            <span class="error" v-if="appUdate.error">ERROR: {{ appUdate.error }}</span>
+            <span class="checking" v-if="appUdate.checking">Checking...</span>
+            <span class="updated" v-if="appUdate.updated">Updated. Version {{ '?v=1.6.12-42'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1 ($2)') }}.</span>
+            <span class="updating" v-if="appUdate.updating">Updating...</span>
+          </div>
+          <div class="update-info" v-else>
+            AUTO UPDATE: Unavailable
           </div>
           <div class="times-config">
             <div class="time-config" v-for="(iqamahTime, name) in iqamahTimes">
@@ -69,7 +79,7 @@
     display: none;
     ">
       <span style="opacity: 0.75;">
-        Version {{ '?v=1.6.3-32'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1') }}
+        Version {{ '?v=1.6.12-42'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1') }}
       </span>
       <span style="
 opacity: 0.9;
@@ -78,7 +88,7 @@ font-size: 1.5rem;
 padding: 0.25rem;
 border-radius: 50%;
 text-align: center;
-      ">{{ '?v=1.6.3-32'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$2') }}</span>
+      ">{{ '?v=1.6.12-42'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$2') }}</span>
     </div>
 
 
@@ -229,13 +239,14 @@ text-align: center;
   </div>
 
   </div>
-  <script type="text/javascript" src="prayer-data.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/vendors/hijri.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/js/translations.js?v=1.6.3-32"></script>
-  <script type="text/javascript" src="assets/js/app.js?v=1.6.3-32"></script>
+  <script type="text/javascript" src="cordova.js"></script>
+  <script type="text/javascript" src="prayer-data.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/vendors/hijri.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/js/translations.js?v=1.6.12-42"></script>
+  <script type="text/javascript" src="assets/js/app.js?v=1.6.12-42"></script>
   <script type="text/javascript">
 
     var isLocalhost = window.location.hostname == 'localhost';
@@ -325,11 +336,14 @@ if ('serviceWorker' in navigator
 }
   </script>
   <script type="text/javascript">
+    window.askAndAutoUpdate = function() {
+        window.codePush.sync(null, { updateDialog: true, installMode: InstallMode.IMMEDIATE });;
+    }
     document.addEventListener("deviceready", function () {
-        codePush.sync();
+      window.askAndAutoUpdate();
     });
     document.addEventListener("resume", function () {
-        codePush.sync();
+      window.askAndAutoUpdate();
     });
   </script>
 </body>
