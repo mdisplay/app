@@ -475,6 +475,86 @@ class App {
     this.writeStorage();
     this.shouldReload = true;
   }
+  initShortcuts() {
+    const KEY_CODES = {
+      ENTER: 13,
+      ARROW_LEFT: 37,
+      ARROW_UP: 38,
+      ARROW_RIGHT: 39,
+      ARROW_DOWN: 40,
+    };
+    const body = document.querySelector('body');
+    body.onkeydown = (event) => {
+      if (!event.metaKey) {
+        // e.preventDefault();
+      }
+      const keyCode = event.keyCode;
+      if (keyCode == KEY_CODES.ENTER) {
+        event.preventDefault();
+        if (this.data.settingsMode) {
+          this.closeSettings();
+        } else {
+          this.openSettings();
+        }
+        return;
+      }
+      if (!this.data.settingsMode) {
+        return;
+      }
+      const rows = document.querySelectorAll('.times-config .time-config');
+      if (keyCode == KEY_CODES.ARROW_DOWN || keyCode == KEY_CODES.ARROW_UP) {
+        event.preventDefault();
+        let lastSelectedRow = this.lastSelectedRow || 0;
+        let lastSelectedCol = this.lastSelectedCol || 1;
+        lastSelectedRow += keyCode == KEY_CODES.ARROW_UP ? -1 : 1;
+        if(lastSelectedRow < 1) {
+          lastSelectedRow = rows.length;
+        }
+        if(lastSelectedRow > rows.length) {
+          lastSelectedRow = 1;
+        }
+        const row = rows[lastSelectedRow - 1];
+        const cols = row.querySelectorAll('input');
+        if(lastSelectedCol < 1) {
+          lastSelectedCol = cols.length;
+        }
+        if(lastSelectedCol > cols.length) {
+          lastSelectedCol = 1;
+        }
+        const col = cols[lastSelectedCol - 1];
+        console.log('SHOULD FOCUS: ', col.value, col);
+        col.focus();
+        this.lastSelectedRow = lastSelectedRow;
+        this.lastSelectedCol = lastSelectedCol;
+      }
+
+      if (keyCode == KEY_CODES.ARROW_LEFT || keyCode == KEY_CODES.ARROW_RIGHT) {
+        event.preventDefault();
+        let lastSelectedRow = this.lastSelectedRow || 1;
+        let lastSelectedCol = this.lastSelectedCol || 0;
+        if(lastSelectedRow < 1) {
+          lastSelectedRow = rows.length;
+        }
+        if(lastSelectedRow > rows.length) {
+          lastSelectedRow = 1;
+        }
+        const row = rows[lastSelectedRow - 1];
+        const cols = row.querySelectorAll('input');
+        lastSelectedCol += keyCode == KEY_CODES.ARROW_LEFT ? -1 : 1;
+        if(lastSelectedCol < 1) {
+          lastSelectedCol = cols.length;
+        }
+        if(lastSelectedCol > cols.length) {
+          lastSelectedCol = 1;
+        }
+        const col = cols[lastSelectedCol - 1];
+        console.log('SHOULD FOCUS: ', col.value, col);
+        col.focus();
+        this.lastSelectedRow = lastSelectedRow;
+        this.lastSelectedCol = lastSelectedCol;
+      }
+    };
+  }
   init(initialTime, callback){
     this.initialTime = initialTime;
     this.initStorage(() => {    
@@ -482,6 +562,7 @@ class App {
       if(callback) {
         callback();
       }
+      this.initShortcuts();
     });
   }
 }
