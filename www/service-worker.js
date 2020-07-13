@@ -6,10 +6,10 @@ if (workbox) {
   console.log(`Boo! Workbox didn't load 😬`);
 }
 
-var appVersion = '1.6.3-32';
-var dataVersion = '1';
+var appVersion = '1.8.1-47';
+var dataVersion = '2';
 var vendorVersion = '2';
-var bgVersion = '1';
+var bgVersion = '4';
 
 // Detailed logging is very useful during development
 workbox.setConfig({ debug: true });
@@ -51,7 +51,11 @@ var precacheList = [
     url: baseUrl + 'assets/vendors/reboot.css',
     revision: vendorVersion,
   },
-  // /vendors
+  {
+    url: baseUrl + 'assets/vendors/workbox-window.prod.umd.js',
+    revision: vendorVersion,
+  },
+  // /icons
   {
     url: baseUrl + 'assets/images/icon.png',
     revision: vendorVersion,
@@ -81,15 +85,26 @@ var precacheList = [
   // 'assets/**/*.{css,js}',
 ];
 
+var backgroundsList = [];
+
+for (var i = 1; i <= 11; i++) {
+  backgroundsList.push({
+    url: baseUrl + 'backgrounds/' + i + '.jpg',
+    revision: bgVersion,
+  });
+}
+
+precacheList = precacheList.concat(backgroundsList);
+
 // precache all the site files
 workbox.precaching.precacheAndRoute(precacheList, {
   ignoreURLParametersMatching: [/.*/],
 });
 
-workbox.routing.registerRoute(
-  new RegExp(baseUrl + 'backgrounds/.+.jpg'),
-  new workbox.strategies.CacheFirst({
-    // Use a custom cache name
-    cacheName: 'md-bg-' + bgVersion,
-  }),
-);
+// workbox.routing.registerRoute(
+//   new RegExp(baseUrl + 'backgrounds/.+.jpg'),
+//   new workbox.strategies.CacheFirst({
+//     // Use a custom cache name
+//     cacheName: 'md-bg-' + bgVersion,
+//   }),
+// );

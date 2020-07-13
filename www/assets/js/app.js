@@ -4,7 +4,7 @@ var padZero = (number) => {
     return '0' + number;
   }
   return '' + number;
-}
+};
 
 class Prayer {
   constructor(name, time, iqamahTime, lang) {
@@ -39,7 +39,7 @@ class IqamahTime {
     // if(parts.length === 2) {
     //   this.isAbsolute = true;
     // } else {
-    //   parts[1] = 
+    //   parts[1] =
     // }
 
     // this.hours = parts[1] || '00';
@@ -57,9 +57,9 @@ class IqamahTime {
   }
 }
 
-IqamahTime.fromRaw = function(raw) {
+IqamahTime.fromRaw = function (raw) {
   return new IqamahTime(raw.minutes, raw.hours, raw.absolute);
-}
+};
 
 // class AppUpdater {
 //   constructor() {
@@ -71,8 +71,8 @@ class App {
   constructor() {
     this.lang = 'ta';
     this.prayerData = [];
-    for(let month in window.PRAYER_DATA) {
-      if(window.PRAYER_DATA.hasOwnProperty(month)){
+    for (let month in window.PRAYER_DATA) {
+      if (window.PRAYER_DATA.hasOwnProperty(month)) {
         this.prayerData.push(window.PRAYER_DATA[month]);
       }
     }
@@ -80,7 +80,7 @@ class App {
       showSplash: true,
       // currentPrayerWaiting: false,
       // time: new Date(),
-      // timeDisplay: 
+      // timeDisplay:
       // prayers: [],
       settingsMode: false,
       iqamahTimesConfigured: false,
@@ -97,20 +97,25 @@ class App {
         updated: false,
         updating: false,
         error: false,
-      }
+      },
+      kioskMode: {
+        available: false,
+        enabled: false,
+        isHome: false,
+      },
     };
     this.isInitial = true;
-    this.beforeSeconds = 5*60;
+    this.beforeSeconds = 5 * 60;
     // this.beforeSeconds = 1*60;
-    this.afterSeconds = 5*60;
+    this.afterSeconds = 5 * 60;
     // this.afterSeconds = 1;
     // this.afterSeconds = 1*60;
-    this.afterSeconds = 2*60;
-    this.data.bgVersion = '3';
+    this.afterSeconds = 2 * 60;
+    this.data.bgVersion = '4';
   }
 
   checkForUpdates() {
-    if(window.codePush === undefined){
+    if (window.codePush === undefined) {
       console.log('codePush not available');
       return;
     }
@@ -122,30 +127,43 @@ class App {
     this.data.appUdate.checking = true;
     this.data.appUdate.updated = false;
     this.data.appUdate.updating = false;
-    window.codePush.checkForUpdate((update) => {
-      this.data.appUdate.error = false;
-      this.data.appUdate.checking = false;
-      this.data.appUdate.updating = false;
-      this.data.appUdate.updated = false;
-      if (!update) {
-        // alert("The app is up to date.");
-        this.data.appUdate.updated = true;
-      } else {
-        this.data.appUdate.updating = true;
-        window.askAndAutoUpdate();
-        // alert("An update is available! Should we download it?");
-        // window.codePush.restartApplication();
-      }
-    }, (error) => {
-      this.data.appUdate.checking = false;
-      this.data.appUdate.updating = false;
-      this.data.appUdate.updated = false;
-      this.data.appUdate.error = error;
-    });
+    window.codePush.checkForUpdate(
+      (update) => {
+        this.data.appUdate.error = false;
+        this.data.appUdate.checking = false;
+        this.data.appUdate.updating = false;
+        this.data.appUdate.updated = false;
+        if (!update) {
+          // alert("The app is up to date.");
+          this.data.appUdate.updated = true;
+        } else {
+          this.data.appUdate.updating = true;
+          window.askAndAutoUpdate();
+          // alert("An update is available! Should we download it?");
+          // window.codePush.restartApplication();
+        }
+      },
+      (error) => {
+        this.data.appUdate.checking = false;
+        this.data.appUdate.updating = false;
+        this.data.appUdate.updated = false;
+        this.data.appUdate.error = error;
+      },
+    );
+  }
+
+  checkForKioskMode() {
+    if (window.Kiosk === undefined) {
+      console.log('Kiosk not available');
+      return;
+    }
+    this.data.kioskMode.available = true;
+    // this.data.kioskMode.enabled = true;
+    // kioskMode;
   }
 
   getRandomNumber(min, max) {
-    return Math.floor(min + (Math.random() * (max - min + 1)));
+    return Math.floor(min + Math.random() * (max - min + 1));
   }
   updateTime() {
     if (!this.data.time) {
@@ -166,13 +184,12 @@ class App {
   getTime(monthParam, dayParam, time) {
     let timeParts = time.split(':');
     let hoursAdd = 0;
-    if(timeParts[1].indexOf('p') != -1) {
+    if (timeParts[1].indexOf('p') != -1) {
       hoursAdd = 12;
     }
     const hours = hoursAdd + parseInt(timeParts[0]);
     const minutes = parseInt(timeParts[1].replace('a', '').replace('p', ''));
-    return moment((monthParam + 1) + ' ' + dayParam + ' ' + time + 'm', 'M D hh:mma').toDate();
-
+    return moment(monthParam + 1 + ' ' + dayParam + ' ' + time + 'm', 'M D hh:mma').toDate();
   }
   getTimes(monthParam, dayParam) {
     const times = [];
@@ -195,12 +212,12 @@ class App {
   }
   getIqamahTimes(prayerTimes, monthParam, dayParam) {
     const iqamahTimes = {};
-    for(const name in this.data.iqamahTimes) {
+    for (const name in this.data.iqamahTimes) {
       const iqamahTime = this.data.iqamahTimes[name];
-      if(iqamahTime.absolute) {
+      if (iqamahTime.absolute) {
         iqamahTimes[name] = this.getTime(monthParam, dayParam, iqamahTime.toTime() + (name == 'Subah' ? 'a' : 'p'));
       } else {
-        iqamahTimes[name] = new Date(prayerTimes[name].getTime() + (parseInt(iqamahTime.minutes) * 60 * 1000));
+        iqamahTimes[name] = new Date(prayerTimes[name].getTime() + parseInt(iqamahTime.minutes) * 60 * 1000);
       }
     }
     return iqamahTimes;
@@ -225,7 +242,7 @@ class App {
     ];
     this.data.prayers = this.todayPrayers;
 
-    const tomorrowParams = this.getDateParams(new Date(this.data.time.getTime() + (24*60*60*1000)));
+    const tomorrowParams = this.getDateParams(new Date(this.data.time.getTime() + 24 * 60 * 60 * 1000));
     const tomorrowTimes = this.getTimes(tomorrowParams[1], tomorrowParams[2]);
     const tomorrowIqamahTimes = this.getIqamahTimes(tomorrowTimes, tomorrowParams[1], tomorrowParams[2]);
     this.nextDayPrayers = [
@@ -249,15 +266,19 @@ class App {
     const month = translations[this.lang].months[this.data.time.getMonth()];
     // this.data.dateDisplay = d.format('ddd, DD MMM YYYY');
     this.data.weekDayDisplay = day;
-    this.data.dateDisplay = //day + ', ' + 
-    padZero(this.data.time.getDate()) + ' ' + month + ' ' + this.data.time.getFullYear();
+    this.data.dateDisplay = padZero(this.data.time.getDate()) + ' ' + month + ' ' + this.data.time.getFullYear(); //day + ', ' +
     const hijriMonth = parseInt(d.format('iM'));
     // this.data.hijriDateDisplay = d.format('iDD, ___ (iMM) iYYYY').replace('___', translations.ta.months[hijriMonth - 1]);
     // const hijriDate = new HijriDate(this.data.time.getTime());
-    const hijriDate = HijriJS.gregorianToHijri(this.data.time.getFullYear(), this.data.time.getMonth()+1, this.data.time.getDate());
+    const hijriDate = HijriJS.gregorianToHijri(
+      this.data.time.getFullYear(),
+      this.data.time.getMonth() + 1,
+      this.data.time.getDate(),
+    );
     // this.data.hijriDateDisplay = d.format('iDD ___ iYYYY').replace('___', translations.ta.months[hijriMonth - 1]);
     // this.data.hijriDateDisplay = padZero(hijriDate.getDate()) + ' ' + translations.ta.months[hijriDate.getMonth()] + ' ' + hijriDate.getFullYear();
-    this.data.hijriDateDisplay = padZero(hijriDate.day) + ' ' + translations[this.lang].hijriMonths[hijriDate.month - 1] + ' ' + hijriDate.year;
+    this.data.hijriDateDisplay =
+      padZero(hijriDate.day) + ' ' + translations[this.lang].hijriMonths[hijriDate.month - 1] + ' ' + hijriDate.year;
     // this.data.hijriDateDisplay = hijriDate.toFormat('dd mm YYYY');
 
     this.data.prayerInfo = 'athan';
@@ -267,7 +288,7 @@ class App {
     this.data.backgroundImage = 'backgrounds/' + this.getRandomNumber(1, 11) + '.jpg?v=' + this.data.bgVersion;
   }
   commitCurrentPrayer() {
-    if(!this.data.currentPrayer) {
+    if (!this.data.currentPrayer) {
       this.data.currentPrayerDescription = '';
       return;
     }
@@ -278,19 +299,18 @@ class App {
     } else if (this.data.currentPrayerAfter) {
       this.data.currentPrayerDescription = translations[this.lang].currentPrayerAfter;
     }
-
   }
   checkCurrentPrayer(currentPrayer) {
     const nowTime = this.data.time.getTime();
     const iqamahTime = currentPrayer.iqamahTime.getTime();
-    if(nowTime >= iqamahTime) {
-      if(nowTime - iqamahTime < this.afterSeconds * 1000) {
+    if (nowTime >= iqamahTime) {
+      if (nowTime - iqamahTime < this.afterSeconds * 1000) {
         this.data.currentPrayer = currentPrayer;
         this.data.currentPrayerBefore = false;
         // this.data.currentPrayerAfter = true;
         const duration = moment.duration(nowTime - iqamahTime, 'milliseconds');
         // this.data.currentPrayerAfter = padZero(duration.minutes()) + ':' + padZero(duration.seconds());
-        let pause = nowTime - iqamahTime < (15 * 1000);
+        let pause = nowTime - iqamahTime < 15 * 1000;
         pause = true;
         this.data.currentPrayerAfter = {
           minutes: pause ? '00' : padZero(duration.minutes()),
@@ -301,37 +321,41 @@ class App {
       } else {
         this.data.currentPrayer = undefined;
         this.data.currentPrayerBefore = false;
-        this.data.currentPrayerAfter = false;  
-        this.data.currentPrayerWaiting = false;          
+        this.data.currentPrayerAfter = false;
+        this.data.currentPrayerWaiting = false;
       }
     } else {
       this.data.currentPrayer = currentPrayer;
       this.data.currentPrayerBefore = false;
       this.data.currentPrayerAfter = false;
-      if (nowTime - currentPrayer.time.getTime() < (15 * 1000)) {
+      if (nowTime - currentPrayer.time.getTime() < 15 * 1000) {
         this.data.currentPrayerWaiting = false;
         this.data.currentPrayerBefore = {
           minutes: '00', // padZero(duration.minutes()),
           colon: this.data.currentPrayerBefore && this.data.currentPrayerBefore.colon == ':' ? ':' : ':',
-          seconds: '00', // padZero(duration.seconds()),          
+          seconds: '00', // padZero(duration.seconds()),
         };
         return;
       }
       const duration = moment.duration(iqamahTime - nowTime, 'milliseconds');
       this.data.currentPrayerWaiting = {
-          minutes: padZero(duration.minutes()),
-          colon: this.data.currentPrayerWaiting && this.data.currentPrayerWaiting.colon == ':' ? '' : ':',
-          seconds: padZero(duration.seconds()),
+        minutes: padZero(duration.minutes()),
+        colon: this.data.currentPrayerWaiting && this.data.currentPrayerWaiting.colon == ':' ? '' : ':',
+        seconds: padZero(duration.seconds()),
       };
     }
   }
   nextTick() {
     this.updateTime();
     const dateParams = this.getDateParams(this.data.time);
-    if(!(this.currentDateParams &&
+    if (
+      !(
+        this.currentDateParams &&
         dateParams[0] === this.currentDateParams[0] &&
         dateParams[1] === this.currentDateParams[1] &&
-        dateParams[2] === this.currentDateParams[2])) {
+        dateParams[2] === this.currentDateParams[2]
+      )
+    ) {
       this.onDayUpdate();
     }
     if (this.data.time.getMinutes() % 5 === 0 && this.data.time.getSeconds() === 0) {
@@ -343,11 +367,11 @@ class App {
     const nowTime = this.data.time.getTime();
     let nextTime = this.data.nextPrayer ? this.data.nextPrayer.time.getTime() : 0;
     // console.log('nextTick');
-    if(nowTime >= (nextTime + 1000)) {
+    if (nowTime >= nextTime + 1000) {
       console.log('coming next');
       let nextPrayer;
-      for(let prayer of this.todayPrayers) {
-        if(nowTime < prayer.time.getTime()) {
+      for (let prayer of this.todayPrayers) {
+        if (nowTime < prayer.time.getTime()) {
           nextPrayer = prayer;
           break;
         }
@@ -369,7 +393,7 @@ class App {
         colon: this.data.currentPrayerBefore && this.data.currentPrayerBefore.colon == ':' ? ':' : ':',
         seconds: '00', // padZero(duration.seconds()),
       };
-    } else if(nextTime - nowTime < this.beforeSeconds * 1000) {
+    } else if (nextTime - nowTime < this.beforeSeconds * 1000) {
       this.data.currentPrayer = this.data.nextPrayer;
       const duration = moment.duration(nextTime - nowTime, 'milliseconds');
       this.data.currentPrayerBefore = {
@@ -380,18 +404,19 @@ class App {
       this.data.currentPrayerAfter = false;
       this.data.currentPrayerWaiting = false;
     } else {
-      if(this.data.currentPrayer) {
+      if (this.data.currentPrayer) {
         this.checkCurrentPrayer(this.data.currentPrayer);
       } else {
-        if(this.isInitial){
+        if (this.isInitial) {
           console.log('is isInitial');
           // if (nowTime < ) {}
           let prevPrayer;
-          if(this.data.nextPrayer === this.nextDayPrayers[0]){
+          if (this.data.nextPrayer === this.nextDayPrayers[0]) {
             prevPrayer = this.todayPrayers[this.todayPrayers.length - 1];
           } else {
             const idx = this.todayPrayers.indexOf(this.data.nextPrayer);
-            if (idx > 0) { // not subah
+            if (idx > 0) {
+              // not subah
               prevPrayer = this.todayPrayers[idx - 1];
             }
           }
@@ -418,6 +443,7 @@ class App {
   openSettings() {
     this.data.settingsMode = true;
     this.checkForUpdates();
+    this.checkForKioskMode();
   }
   closeSettings() {
     this.data.settingsMode = false;
@@ -431,15 +457,18 @@ class App {
     if (this.analogClock) {
       this.analogClock.init(document.getElementById('analog-clock-container'), this.initialTime);
     }
-    window._theInterval = window.setInterval(()=> {
-      this.nextTick();
-    }, this.simulateTime ? this.simulateTime : 1000);
-    setTimeout(()=> {
+    window._theInterval = window.setInterval(
+      () => {
+        this.nextTick();
+      },
+      this.simulateTime ? this.simulateTime : 1000,
+    );
+    setTimeout(() => {
       this.data.showSplash = false;
     }, 1000);
   }
   created() {
-    if(window._theInterval){
+    if (window._theInterval) {
       window.clearInterval(window._theInterval);
     }
   }
@@ -447,13 +476,12 @@ class App {
     let iqamahTimes;
     try {
       iqamahTimes = JSON.parse(localStorage.getItem('mdisplay.iqamahTimes'));
-    }
-    catch(e) {}
-    if(!iqamahTimes){
+    } catch (e) {}
+    if (!iqamahTimes) {
       return callback();
     }
     const iqamahTimesConfigured = localStorage.getItem('mdisplay.iqamahTimesConfigured');
-    for(const name in iqamahTimes) {
+    for (const name in iqamahTimes) {
       this.data.iqamahTimes[name] = IqamahTime.fromRaw(iqamahTimes[name]);
     }
     this.data.iqamahTimesConfigured = !!iqamahTimesConfigured;
@@ -461,7 +489,7 @@ class App {
   }
   writeStorage(callback) {
     const iqamahTimes = {};
-    for(const name in this.data.iqamahTimes) {
+    for (const name in this.data.iqamahTimes) {
       iqamahTimes[name] = this.data.iqamahTimes[name].toRaw();
     }
     this.data.iqamahTimesConfigured = true;
@@ -507,18 +535,18 @@ class App {
         let lastSelectedRow = this.lastSelectedRow || 0;
         let lastSelectedCol = this.lastSelectedCol || 1;
         lastSelectedRow += keyCode == KEY_CODES.ARROW_UP ? -1 : 1;
-        if(lastSelectedRow < 1) {
+        if (lastSelectedRow < 1) {
           lastSelectedRow = rows.length;
         }
-        if(lastSelectedRow > rows.length) {
+        if (lastSelectedRow > rows.length) {
           lastSelectedRow = 1;
         }
         const row = rows[lastSelectedRow - 1];
         const cols = row.querySelectorAll('input');
-        if(lastSelectedCol < 1) {
+        if (lastSelectedCol < 1) {
           lastSelectedCol = cols.length;
         }
-        if(lastSelectedCol > cols.length) {
+        if (lastSelectedCol > cols.length) {
           lastSelectedCol = 1;
         }
         const col = cols[lastSelectedCol - 1];
@@ -532,19 +560,19 @@ class App {
         event.preventDefault();
         let lastSelectedRow = this.lastSelectedRow || 1;
         let lastSelectedCol = this.lastSelectedCol || 0;
-        if(lastSelectedRow < 1) {
+        if (lastSelectedRow < 1) {
           lastSelectedRow = rows.length;
         }
-        if(lastSelectedRow > rows.length) {
+        if (lastSelectedRow > rows.length) {
           lastSelectedRow = 1;
         }
         const row = rows[lastSelectedRow - 1];
         const cols = row.querySelectorAll('input');
         lastSelectedCol += keyCode == KEY_CODES.ARROW_LEFT ? -1 : 1;
-        if(lastSelectedCol < 1) {
+        if (lastSelectedCol < 1) {
           lastSelectedCol = cols.length;
         }
-        if(lastSelectedCol > cols.length) {
+        if (lastSelectedCol > cols.length) {
           lastSelectedCol = 1;
         }
         const col = cols[lastSelectedCol - 1];
@@ -555,11 +583,11 @@ class App {
       }
     };
   }
-  init(initialTime, callback){
+  init(initialTime, callback) {
     this.initialTime = initialTime;
-    this.initStorage(() => {    
+    this.initStorage(() => {
       this.nextTick();
-      if(callback) {
+      if (callback) {
         callback();
       }
       this.initShortcuts();
