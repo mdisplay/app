@@ -5,7 +5,6 @@
   "main": "index.js",
   "dependencies": {
     "code-push": "^3.0.1",
-    "com.hughisaacs2.cordova.plugins.androidtvplugin": "git+https://github.com/hughisaacs2/Cordova-Android-TV-Plugin.git",
     "cordova-android": "^8.1.0",
     "cordova-plugin-code-push": "^1.12.0",
     "cordova-plugin-compat": "^1.2.0",
@@ -14,7 +13,6 @@
     "cordova-plugin-file": "^4.3.3",
     "cordova-plugin-file-transfer": "^1.6.3",
     "cordova-plugin-fullscreen": "^1.2.0",
-    "cordova-plugin-kiosk-launcher": "^1.1.1",
     "cordova-plugin-whitelist": "^1.3.4",
     "cordova-plugin-zip": "^3.1.0"
   },
@@ -35,9 +33,7 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-whitelist": {},
-      "cordova-plugin-code-push": {},
-      "cordova-plugin-kiosk-launcher": {},
-      "com.hughisaacs2.cordova.plugins.androidtvplugin": {}
+      "cordova-plugin-code-push": {}
     }
   }
 }
