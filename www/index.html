@@ -36,7 +36,8 @@
                   <button type="button" class="">
                     Switch Launcher
                     <template v-if="kioskMode.available">
-                      ({{ kioskMode.enabled ? 'kiosk' : '' }} {{ kioskMode.isHome ? 'home' : '' }})
+                      (Available, {{ kioskMode.enabled ? 'kiosk' : 'nokiosk' }} {{ kioskMode.isHome ? 'home' : 'nohome'
+                      }})
                     </template>
                     <template v-else>
                       (Unavailable)
