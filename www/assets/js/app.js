@@ -120,6 +120,7 @@ class App {
   checkForUpdates() {
     if (window.codePush === undefined) {
       console.log('codePush not available');
+      alert('AUTO UPDATE not available!');
       return;
     }
     this.data.appUdate.enabled = true;
@@ -457,7 +458,6 @@ class App {
   }
   openSettings() {
     this.data.settingsMode = true;
-    this.checkForUpdates();
     this.checkForKioskMode();
   }
   closeSettings() {
@@ -532,6 +532,7 @@ class App {
         // e.preventDefault();
       }
       const keyCode = event.keyCode;
+      // alert('keyCode: ' + keyCode);
       if (keyCode == KEY_CODES.ENTER) {
         event.preventDefault();
         if (this.data.settingsMode) {

@@ -7,7 +7,6 @@
     <name>AndroidTVPlugin</name>
     <description>Cordova Android TV Plugin</description>
     <license>MIT</license>
-    <keywords>ecosystem:cordova,cordova-android</keywords>
     <keywords>ecosystem:cordova,cordova-android,androidtv,tv</keywords>
 
     <engines>
@@ -15,27 +14,17 @@
     </engines>
 
     <platform name="android">
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-feature android:name="android.software.leanback" android:required="false"/>
-            <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-            <uses-feature android:name="android.hardware.camera" android:required="false"/>
-            <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
-            <uses-feature android:name="android.hardware.microphone" android:required="false"/>
-            <uses-feature android:name="android.hardware.wifi" android:required="false"/>
-            <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
-            <uses-feature android:name="android.hardware.location" android:required="false"/>
-            <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
-            <uses-feature android:name="android.hardware.location.network" android:required="false"/>
-            <uses-feature android:name="android.hardware.telephony" android:required="false"/>
-        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application/activity[@android:label='@string/activity_name']">
+            <intent-filter>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest/application/activity/intent-filter">
-            <category android:name="android.intent.category.DEFAULT"/>
-            <category android:name="android.intent.category.LAUNCHER"/>
-            <category android:name="tv.ouya.intent.category.APP"/>
-            <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
-        </config-file>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" /><!-- Handler of app icon (required to be launcher) -->
+                <category android:name="android.intent.category.HOME" /><!-- Handler of Home button -->
 
-        <hook type="after_prepare" src="patch.js"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="tv.ouya.intent.category.APP"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+        </config-file>
     </platform>
 </plugin>

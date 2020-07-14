@@ -45,7 +45,7 @@
                   </button>
                 </div>
                 <div class="" v-if="appUdate.enabled">
-                  AUTO UPDATE:
+                  AUTO UPDATE: <button type="button" @click="checkForUpdates()">Check</button>
                   <span class="error" v-if="appUdate.error">ERROR: {{ appUdate.error }}</span>
                   <span class="checking" v-if="appUdate.checking">Checking...</span>
                   <span class="updated" v-if="appUdate.updated"
@@ -53,9 +53,7 @@
                   >
                   <span class="updating" v-if="appUdate.updating">Updating...</span>
                 </div>
-                <div class="" v-else>
-                  AUTO UPDATE: Unavailable
-                </div>
+                <div class="" v-else>AUTO UPDATE: <button type="button" @click="checkForUpdates()">Check</button></div>
               </div>
               <div class="times-config">
                 <div class="time-config" v-for="(iqamahTime, name) in iqamahTimes">
@@ -295,6 +293,13 @@
       </div>
     </div>
     <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="prayer-data.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/vendors/hijri.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/js/translations.js?v=1.8.5-51"></script>
+    <script type="text/javascript" src="assets/js/app.js?v=1.8.5-51"></script>
     <script type="text/javascript">
       var isLocalhost = window.location.hostname == 'localhost';
       var hasCordova = !!window.cordova;
@@ -315,20 +320,25 @@
               //
             }
           );
-          window.askAndAutoUpdate();
+          // window.askAndAutoUpdate();
+          document.addEventListener(
+            'backbutton',
+            function (e) {
+              if (window.app && window.app.data.settingsMode) {
+                //
+              } else {
+              }
+              e.preventDefault();
+              return false;
+            },
+            false
+          );
         });
-        document.addEventListener('resume', function () {
-          window.askAndAutoUpdate();
-        });
+        // document.addEventListener('resume', function () {
+        //   window.askAndAutoUpdate();
+        // });
       }
     </script>
-    <script type="text/javascript" src="prayer-data.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/vendors/hijri.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/js/translations.js?v=1.8.5-51"></script>
-    <script type="text/javascript" src="assets/js/app.js?v=1.8.5-51"></script>
     <script type="text/javascript">
       var isLocalhost = window.location.hostname == 'localhost';
       var enableServiceWorker = !isLocalhost && !window.cordova;
@@ -372,6 +382,9 @@
             },
             openSettings() {
               app.openSettings();
+            },
+            checkForUpdates() {
+              app.checkForUpdates();
             },
             toggleAbsolute(iqamahTime) {
               iqamahTime.absolute = !iqamahTime.absolute;
