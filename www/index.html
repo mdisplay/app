@@ -31,17 +31,30 @@
                 <span class="configured" v-if="iqamahTimesConfigured">Configured</span>
                 <span class="not-configured" v-else>Not Configured</span>
               </div>
-              <div class="update-info" v-if="appUdate.enabled">
-                AUTO UPDATE:
-                <span class="error" v-if="appUdate.error">ERROR: {{ appUdate.error }}</span>
-                <span class="checking" v-if="appUdate.checking">Checking...</span>
-                <span class="updated" v-if="appUdate.updated"
-                  >Updated. Version {{ '?v=1.8.4-50'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1 ($2)') }}.</span
-                >
-                <span class="updating" v-if="appUdate.updating">Updating...</span>
-              </div>
-              <div class="update-info" v-else>
-                AUTO UPDATE: Unavailable
+              <div class="update-info">
+                <div class="kiosk-config">
+                  <button type="button" class="">
+                    Switch Launcher
+                    <template v-if="kioskMode.available">
+                      ({{ kioskMode.enabled ? 'kiosk' : '' }} {{ kioskMode.isHome ? 'home' : '' }})
+                    </template>
+                    <template v-else>
+                      (Unavailable)
+                    </template>
+                  </button>
+                </div>
+                <div class="" v-if="appUdate.enabled">
+                  AUTO UPDATE:
+                  <span class="error" v-if="appUdate.error">ERROR: {{ appUdate.error }}</span>
+                  <span class="checking" v-if="appUdate.checking">Checking...</span>
+                  <span class="updated" v-if="appUdate.updated"
+                    >Updated. Version {{ '?v=1.8.4-50'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1 ($2)') }}.</span
+                  >
+                  <span class="updating" v-if="appUdate.updating">Updating...</span>
+                </div>
+                <div class="" v-else>
+                  AUTO UPDATE: Unavailable
+                </div>
               </div>
               <div class="times-config">
                 <div class="time-config" v-for="(iqamahTime, name) in iqamahTimes">
@@ -82,7 +95,6 @@
                   </span>
                 </div>
               </div>
-              <div class="kiosk-config"></div>
             </div>
           </div>
         </div>

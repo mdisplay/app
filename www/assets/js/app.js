@@ -102,6 +102,9 @@ class App {
         available: false,
         enabled: false,
         isHome: false,
+        switchLauncher: () => {
+          alert('Kiosk not available');
+        },
       },
     };
     this.isInitial = true;
@@ -154,10 +157,22 @@ class App {
 
   checkForKioskMode() {
     if (window.Kiosk === undefined) {
+      this.data.kioskMode.available = false;
+      this.data.kioskMode.enabled = false;
+      this.data.kioskMode.isHome = false;
       console.log('Kiosk not available');
       return;
     }
     this.data.kioskMode.available = true;
+    Kiosk.isInKiosk((isInKiosk) => {
+      this.data.kioskMode.enabled = isInKiosk;
+    });
+    Kiosk.isSetAsLauncher((isSetAsLauncher) => {
+      this.data.kioskMode.isHome = isSetAsLauncher;
+    });
+    this.data.kioskMode.switchLauncher = () => {
+      Kiosk.switchLauncher();
+    };
     // this.data.kioskMode.enabled = true;
     // kioskMode;
   }
