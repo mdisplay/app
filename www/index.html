@@ -6,9 +6,9 @@
     <title>MDisplay Live</title>
     <link rel="shortcut icon" href="assets/images/favicon.png" />
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-    <link rel="stylesheet" type="text/css" href="assets/vendors/reboot.css?v=1.8.3-49" />
-    <link rel="stylesheet" type="text/css" href="assets/css/app.css?v=1.8.3-49" />
-    <link rel="stylesheet" type="text/css" href="assets/css/theme-default.css?v=1.8.3-49" />
+    <link rel="stylesheet" type="text/css" href="assets/vendors/reboot.css?v=1.8.2-48" />
+    <link rel="stylesheet" type="text/css" href="assets/css/app.css?v=1.8.2-48" />
+    <link rel="stylesheet" type="text/css" href="assets/css/theme-default.css?v=1.8.2-48" />
   </head>
   <body>
     <div
@@ -36,7 +36,7 @@
                 <span class="error" v-if="appUdate.error">ERROR: {{ appUdate.error }}</span>
                 <span class="checking" v-if="appUdate.checking">Checking...</span>
                 <span class="updated" v-if="appUdate.updated"
-                  >Updated. Version {{ '?v=1.8.3-49'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1 ($2)') }}.</span
+                  >Updated. Version {{ '?v=1.8.2-48'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1 ($2)') }}.</span
                 >
                 <span class="updating" v-if="appUdate.updating">Updating...</span>
               </div>
@@ -104,7 +104,7 @@
           "
         >
           <span style="opacity: 0.75;">
-            Version {{ '?v=1.8.3-49'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1') }}
+            Version {{ '?v=1.8.2-48'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$1') }}
           </span>
           <span
             style="
@@ -115,7 +115,7 @@
               border-radius: 50%;
               text-align: center;
             "
-            >{{ '?v=1.8.3-49'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$2') }}</span
+            >{{ '?v=1.8.2-48'.replace(/\?v=(\d+\.\d+\.\d+)-(\d+)/, '$2') }}</span
           >
         </div>
 
@@ -283,35 +283,43 @@
     </div>
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript">
-      window.askAndAutoUpdate = function () {
-        window.codePush.sync(null, { updateDialog: true, installMode: InstallMode.IMMEDIATE });
-      };
-      document.addEventListener('deviceready', function () {
-        AndroidFullScreen.immersiveMode(
-          function () {
-            //
-          },
-          function () {
-            //
-          },
-        );
-        window.askAndAutoUpdate();
-      });
-      document.addEventListener('resume', function () {
-        window.askAndAutoUpdate();
-      });
+      var isLocalhost = window.location.hostname == 'localhost';
+      var hasCordova = !!window.cordova;
+      var enableServiceWorker = !isLocalhost && !hasCordova;
+      var enableServiceWorker = false;
     </script>
-    <script type="text/javascript" src="prayer-data.js?v=1.8.3-49"></script>
-    <!-- <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.8.3-49"></script> -->
-    <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.8.3-49"></script>
-    <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.8.3-49"></script>
-    <script type="text/javascript" src="assets/vendors/hijri.js?v=1.8.3-49"></script>
-    <script type="text/javascript" src="assets/js/translations.js?v=1.8.3-49"></script>
-    <script type="text/javascript" src="assets/js/app.js?v=1.8.3-49"></script>
+    <script type="text/javascript">
+      if (hasCordova) {
+        window.askAndAutoUpdate = function () {
+          window.codePush.sync(null, { updateDialog: true, installMode: InstallMode.IMMEDIATE });
+        };
+        document.addEventListener('deviceready', function () {
+          AndroidFullScreen.immersiveMode(
+            function () {
+              //
+            },
+            function () {
+              //
+            }
+          );
+          window.askAndAutoUpdate();
+        });
+        document.addEventListener('resume', function () {
+          window.askAndAutoUpdate();
+        });
+      }
+    </script>
+    <script type="text/javascript" src="prayer-data.js?v=1.8.2-48"></script>
+    <!-- <script type="text/javascript" src="assets/vendors/workbox-window.prod.umd.js?v=1.8.2-48"></script> -->
+    <script type="text/javascript" src="assets/vendors/vue.min.js?v=1.8.2-48"></script>
+    <script type="text/javascript" src="assets/vendors/moment.min.js?v=1.8.2-48"></script>
+    <script type="text/javascript" src="assets/vendors/hijri.js?v=1.8.2-48"></script>
+    <script type="text/javascript" src="assets/js/translations.js?v=1.8.2-48"></script>
+    <script type="text/javascript" src="assets/js/app.js?v=1.8.2-48"></script>
     <script type="text/javascript">
       var isLocalhost = window.location.hostname == 'localhost';
-      var enableServiceWorker = !isLocalhost;
-      var enableServiceWorker = true;
+      var enableServiceWorker = !isLocalhost && !window.cordova;
+      var enableServiceWorker = false;
 
       if (isLocalhost) {
         window.initialTime =
@@ -325,7 +333,7 @@
             12,
             14,
             56,
-            0,
+            0
           );
         // window.app.simulateTime = 10;
       }
@@ -369,26 +377,25 @@
     <script type="text/javascript">
       // Check that service workers are supported
 
-      // if ('serviceWorker' in navigator && enableServiceWorker && window.location.protocol != 'file:') {
-      //   var serviceWorkerFile = 'service-worker' + (isLocalhost ? '-local' : '') + '.js';
-      //   if (window.workbox && window.workbox.Workbox) {
-      //     var wb = new window.workbox.Workbox(serviceWorkerFile);
+      if ('serviceWorker' in navigator && enableServiceWorker && window.location.protocol != 'file:') {
+        var serviceWorkerFile = 'service-worker' + (isLocalhost ? '-local' : '') + '.js';
+        if (window.workbox && window.workbox.Workbox) {
+          var wb = new window.workbox.Workbox(serviceWorkerFile);
 
-      //     wb.addEventListener('installed', (event) => {
-      //       if (event.isUpdate) {
-      //         // console.log('New content available! Reload the browser to update');
-      //         if (confirm('New update is available! Press OK to refresh')) {
-      //           window.location.reload();
-      //         }
-      //       }
-      //       console.log('installed', event);
-      //     });
+          wb.addEventListener('installed', (event) => {
+            if (event.isUpdate) {
+              // console.log('New content available! Reload the browser to update');
+              if (confirm('New update is available! Press OK to refresh')) {
+                window.location.reload();
+              }
+            }
+            console.log('installed', event);
+          });
 
-      //     wb.register();
+          wb.register();
 
-      //     window.wb = wb;
-      //   } else {
-      if(!window.cordova){
+          window.wb = wb;
+        } else {
           // Use the window load event to keep the page load performant
           window.addEventListener('load', () => {
             navigator.serviceWorker.register(serviceWorkerFile);

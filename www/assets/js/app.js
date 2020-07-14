@@ -148,7 +148,7 @@ class App {
         this.data.appUdate.updating = false;
         this.data.appUdate.updated = false;
         this.data.appUdate.error = error;
-      },
+      }
     );
   }
 
@@ -273,7 +273,7 @@ class App {
     const hijriDate = HijriJS.gregorianToHijri(
       this.data.time.getFullYear(),
       this.data.time.getMonth() + 1,
-      this.data.time.getDate(),
+      this.data.time.getDate()
     );
     // this.data.hijriDateDisplay = d.format('iDD ___ iYYYY').replace('___', translations.ta.months[hijriMonth - 1]);
     // this.data.hijriDateDisplay = padZero(hijriDate.getDate()) + ' ' + translations.ta.months[hijriDate.getMonth()] + ' ' + hijriDate.getFullYear();
@@ -461,7 +461,7 @@ class App {
       () => {
         this.nextTick();
       },
-      this.simulateTime ? this.simulateTime : 1000,
+      this.simulateTime ? this.simulateTime : 1000
     );
     setTimeout(() => {
       this.data.showSplash = false;
