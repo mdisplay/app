@@ -477,7 +477,8 @@ class App {
   }
   closeSettings() {
     this.data.settingsMode = false;
-    if (this.shouldReload) {
+    const reloadOnSettings = true;
+    if (reloadOnSettings || this.shouldReload) {
       window.location.reload();
     }
   }
