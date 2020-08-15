@@ -349,8 +349,8 @@
           // undefined;
           new Date(
             new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate(),
+            6, //new Date().getMonth(),
+            31, // new Date().getDate(),
             // 16, 30, 40,
             // 2, 20, 30,
             12,
@@ -359,6 +359,12 @@
             0
           );
         // window.app.simulateTime = 10;
+
+        // window.app.data.time = window.initialTime;
+        // setInterval(() => {
+        //   window.app.data.time.setDate(window.app.data.time.getDate() + 1);
+        // }, 500);
+        console.log('window.app.simulateTime', window.app.simulateTime);
       }
 
       if (location.hostname == '' || location.hostname == 'zetmel.com' || location.hostname == 'mdisplay.github.io') {

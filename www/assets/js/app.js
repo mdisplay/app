@@ -218,6 +218,9 @@ class App {
         break;
       }
     }
+    if (!times.length) {
+      return false;
+    }
     return {
       Subah: times[0],
       Luhar: times[2],
@@ -242,12 +245,21 @@ class App {
     this.data.prayers = this.nextDayPrayers;
   }
   onDayUpdate() {
-    const dateParams = this.getDateParams(this.data.time);
+    let dateParams = this.getDateParams(this.data.time);
     this.currentDateParams = dateParams;
     // console.log();
-    const times = this.getTimes(this.currentDateParams[1], this.currentDateParams[2]);
+    let times;
+    for (let i = 0; i < 1000; i++) {
+      // try thousand times!;
+      times = this.getTimes(dateParams[1], dateParams[2]);
+      if (!times) {
+        const d = new Date(this.data.time.getTime());
+        d.setDate(d.getDate() + 1);
+        dateParams = this.getDateParams(d);
+      }
+    }
     console.log('all the times', times);
-    const iqamahTimes = this.getIqamahTimes(times, this.currentDateParams[1], this.currentDateParams[2]);
+    const iqamahTimes = this.getIqamahTimes(times, dateParams[1], dateParams[2]);
     this.todayPrayers = [
       new Prayer('Subah', times.Subah, iqamahTimes.Subah, this.lang),
       // new Prayer('Sunrise', times[1], 10, this.lang),
@@ -259,7 +271,10 @@ class App {
     this.data.prayers = this.todayPrayers;
 
     const tomorrowParams = this.getDateParams(new Date(this.data.time.getTime() + 24 * 60 * 60 * 1000));
-    const tomorrowTimes = this.getTimes(tomorrowParams[1], tomorrowParams[2]);
+    let tomorrowTimes = this.getTimes(tomorrowParams[1], tomorrowParams[2]);
+    if (!tomorrowTimes) {
+      tomorrowTimes = times;
+    }
     const tomorrowIqamahTimes = this.getIqamahTimes(tomorrowTimes, tomorrowParams[1], tomorrowParams[2]);
     this.nextDayPrayers = [
       new Prayer('Subah', tomorrowTimes.Subah, tomorrowIqamahTimes.Subah, this.lang),
