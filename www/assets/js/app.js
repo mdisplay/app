@@ -1,3 +1,121 @@
+/* inspired by axios */
+class AjaxRequest {
+  createError(message, code, request, response) {
+    const error = new Error(message);
+    error.error = true;
+    if (code) {
+      error.code = code;
+    }
+    error.request = request;
+    error.response = response;
+    return error;
+  }
+  settle(resolve, reject, response) {
+    const validateStatus = (status) => {
+      return status >= 200 && status < 300;
+    };
+    // Note: status is not exposed by XDomainRequest
+    if (!response.status || !validateStatus || validateStatus(response.status)) {
+      resolve(response);
+    } else {
+      reject(this.createError('Request failed with status code ' + response.status, null, response.request, response));
+    }
+  }
+  request(method, url, formData = null, configureFn) {
+    return new Promise((resolve, reject) => {
+      // tslint:disable-next-line
+      let request = new XMLHttpRequest();
+      const loadEvent = 'onreadystatechange';
+      request.open(method, url, true);
+      // Listen for ready state
+      request[loadEvent] = () => {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // Prepare the response
+        const responseHeaders = request.getAllResponseHeaders();
+        let responseData = request.responseText;
+        const contentType = request.getResponseHeader('Content-Type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+          responseData = JSON.parse(responseData);
+        } else {
+          try {
+            responseData = JSON.parse(responseData);
+          } catch (e) {
+            /* ignore, possibly non json response */
+          }
+        }
+        const response = {
+          data: responseData,
+          // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
+          status: request.status === 1223 ? 204 : request.status,
+          statusText: request.status === 1223 ? 'No Content' : request.statusText,
+          headers: responseHeaders,
+          request,
+        };
+        this.settle(resolve, reject, response);
+        // Clean up request
+        request = null;
+      };
+      // Handle browser request cancellation (as opposed to a manual cancellation)
+      request.onabort = () => {
+        if (!request) {
+          return;
+        }
+        reject(this.createError('Request aborted', 'ECONNABORTED', request));
+        // Clean up request
+        request = null;
+      };
+      // Handle low level network errors
+      request.onerror = () => {
+        // Real errors are hidden from us by the browser
+        // onerror should only fire if it's a network error
+        reject(this.createError('Network Error', null, request));
+        // Clean up request
+        request = null;
+      };
+      // Handle timeout
+      request.ontimeout = () => {
+        reject(this.createError('timeout exceeded', 'ECONNABORTED', request));
+        // Clean up request
+        request = null;
+      };
+      // // Handle progress if needed
+      // if (typeof config.onDownloadProgress === 'function') {
+      //   request.addEventListener('progress', config.onDownloadProgress);
+      // }
+      // Not all browsers support upload events
+      // if (typeof progressCallback === 'function' && request.upload) {
+      //   request.upload.addEventListener('progress', progressCallback);
+      // }
+      if (typeof configureFn === 'function') {
+        configureFn(request);
+      }
+      request.send(formData);
+    });
+  }
+  get(url, formData, configureFn) {
+    return this.request('GET', url, formData, configureFn);
+  }
+  post(url, formData, configureFn) {
+    return this.request('POST', url, formData, configureFn);
+  }
+  delete(url, formData, configureFn) {
+    return this.request('DELETE', url, formData, configureFn);
+  }
+  put(url, formData, configureFn) {
+    return this.request('PUT', url, formData, configureFn);
+  }
+}
+const ajax = new AjaxRequest();
+
 var padZero = (number) => {
   number = parseInt(number);
   if (number < 10) {
@@ -106,6 +224,7 @@ class App {
           alert('Kiosk not available');
         },
       },
+      timeOriginMode: 'device', // or 'internet'
     };
     this.isInitial = true;
     this.beforeSeconds = 5 * 60;
@@ -193,6 +312,7 @@ class App {
     this.data.timeDisplaySeconds = moment(this.data.time).format('ss');
     this.data.timeDisplayColon = this.data.timeDisplayColon == ':' ? '' : ':';
     this.data.timeDisplayAmPm = moment(this.data.time).format('A');
+    this.updateInternetTime();
   }
   getDateParams(date) {
     return [date.getFullYear(), date.getMonth(), date.getDate()];
@@ -505,6 +625,10 @@ class App {
   }
   initStorage(callback) {
     let iqamahTimes;
+    let settings;
+    try {
+      settings = JSON.parse(localStorage.getItem('mdisplay.settings'));
+    } catch (e) {}
     try {
       iqamahTimes = JSON.parse(localStorage.getItem('mdisplay.iqamahTimes'));
     } catch (e) {}
@@ -516,6 +640,10 @@ class App {
       this.data.iqamahTimes[name] = IqamahTime.fromRaw(iqamahTimes[name]);
     }
     this.data.iqamahTimesConfigured = !!iqamahTimesConfigured;
+    if (settings) {
+      this.data.timeOriginMode = settings.timeOriginMode;
+      // ...
+    }
     callback();
   }
   writeStorage(callback) {
@@ -524,8 +652,12 @@ class App {
       iqamahTimes[name] = this.data.iqamahTimes[name].toRaw();
     }
     this.data.iqamahTimesConfigured = true;
+    const settings = {
+      timeOriginMode: this.data.timeOriginMode,
+    };
     localStorage.setItem('mdisplay.iqamahTimes', JSON.stringify(iqamahTimes));
     localStorage.setItem('mdisplay.iqamahTimesConfigured', 1);
+    localStorage.setItem('mdisplay.settings', JSON.stringify(settings));
     if (callback) {
       callback();
     }
@@ -614,6 +746,32 @@ class App {
         this.lastSelectedCol = lastSelectedCol;
       }
     };
+  }
+  updateInternetTime() {
+    if (this.data.timeOriginMode != 'internet') {
+      // console.log('Internet time mode disabled');
+      return;
+    }
+    if (this.internetTimeUpdated) {
+      // console.log('Internet time mode already active');
+      return;
+    }
+    // console.log('Internet time mode fetching...');
+    const url =
+      'https://api.openweathermap.org/data/2.5/onecall?lat=8.030097&lon=79.829091&exclude=hourly,daily,minutely&appid=434d671bede048ae31c56fce770b3149';
+    ajax.get(url).then(
+      (response) => {
+        if (response && response.data && response.data.current && response.data.current.dt) {
+          const timestamp = response.data.current.dt * 1000;
+          this.data.time = new Date(timestamp);
+          this.internetTimeUpdated = true;
+        }
+        console.log('internet data: ', response.data);
+      },
+      (err) => {
+        console.log('err: ', err);
+      }
+    );
   }
   init(initialTime, callback) {
     this.initialTime = initialTime;

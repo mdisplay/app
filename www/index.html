@@ -33,7 +33,7 @@
               </div>
               <div class="update-info">
                 <div class="kiosk-config">
-                  <button type="button" class="">
+                  <!-- <button type="button" class="">
                     Switch Launcher
                     <template v-if="kioskMode.available">
                       (Available, {{ kioskMode.enabled ? 'kiosk' : 'nokiosk' }} {{ kioskMode.isHome ? 'home' : 'nohome'
@@ -42,7 +42,7 @@
                     <template v-else>
                       (Unavailable)
                     </template>
-                  </button>
+                  </button> -->
                 </div>
                 <div class="" v-if="appUdate.enabled">
                   AUTO UPDATE: <button type="button" @click="checkForUpdates()">Check</button>
@@ -92,6 +92,30 @@
                     </span>
                     <span class="" v-else>minutes</span>
                   </span>
+                </div>
+                <div class="time-config">
+                  <label for="time-origin-mode-device">
+                    <input
+                      id="time-origin-mode-device"
+                      type="radio"
+                      name="time-origin-mode"
+                      value="device"
+                      v-model="timeOriginMode"
+                      @change="updateSettings()"
+                    />
+                    Device Time
+                  </label>
+                  <label for="time-origin-mode-internet">
+                    <input
+                      id="time-origin-mode-internet"
+                      type="radio"
+                      name="time-origin-mode"
+                      value="internet"
+                      v-model="timeOriginMode"
+                      @change="updateSettings()"
+                    />
+                    Internet Time <small>(beta)</small>
+                  </label>
                 </div>
               </div>
             </div>
