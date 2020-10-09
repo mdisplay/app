@@ -124,6 +124,12 @@ var padZero = (number) => {
   return '' + number;
 };
 
+class Toast {
+  constructor(message){
+    this.message = message;
+  }
+}
+
 class Prayer {
   constructor(name, time, iqamahTime, lang) {
     this.name = name;
@@ -224,6 +230,8 @@ class App {
           alert('Kiosk not available');
         },
       },
+      toasts: [
+      ],
       timeOriginMode: 'device', // or 'internet'
     };
     this.isInitial = true;
@@ -602,7 +610,19 @@ class App {
       window.location.reload();
     }
   }
+  showToast(message, duration){
+    duration = duration || 3000;
+    var toast = new Toast(message);
+    this.data.toasts.push(toast);
+    setTimeout(() => {
+      var i = this.data.toasts.indexOf(toast);
+      if(i !== -1){
+        this.data.toasts.splice(i, 1);
+      }
+    }, duration);
+  }
   mounted() {
+    this.showToast('Application loaded.', 3000);
     // this.simulateTime = 50;
     this.updateTime();
     if (this.analogClock) {

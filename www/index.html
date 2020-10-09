@@ -314,6 +314,13 @@
             <!-- </transition> -->
           </div>
         </div>
+
+        <div class="toast-container" v-if="toasts.length">
+          <div class="toast-item" v-for="toast in toasts">
+            <div class="toast-text">{{ toast.message }}</div>
+          </div>
+        </div>
+
       </div>
     </div>
     <script type="text/javascript" src="cordova.js"></script>
@@ -432,7 +439,6 @@
     </script>
     <script type="text/javascript">
       // Check that service workers are supported
-
       if ('serviceWorker' in navigator && enableServiceWorker && window.location.protocol != 'file:') {
         var serviceWorkerFile = 'service-worker' + (isLocalhost ? '-local' : '') + '.js';
         if (window.workbox && window.workbox.Workbox) {
@@ -441,9 +447,14 @@
           wb.addEventListener('installed', (event) => {
             if (event.isUpdate) {
               // console.log('New content available! Reload the browser to update');
-              if (confirm('New update is available! Press OK to refresh')) {
-                window.location.reload();
-              }
+              var notificationSeconds = 5000;
+              window.app.showToast('Application updated. Reloading...', notificationSeconds);
+              setTimeout(function(){
+                  window.location.reload();
+              }, notificationSeconds);
+              // if (confirm('New update is available! Press OK to refresh')) {
+              //   window.location.reload();
+              // }
             }
             console.log('installed', event);
           });
