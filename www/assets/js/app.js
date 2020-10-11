@@ -635,7 +635,10 @@ class App {
       this.simulateTime ? this.simulateTime : 1000
     );
     setTimeout(() => {
-      this.data.showSplash = false;
+      // this.data.showSplash = false;
+      setTimeout(() => {
+        window.location = '../../live/index.html';
+      }, 2500);
     }, 1000);
   }
   created() {
