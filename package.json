@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "code-push": "^3.0.1",
+    "code-push": "^3.1.0",
     "cordova-android": "^8.1.0",
     "cordova-plugin-android-tv": "file:cordova-plugins-local-src/cordova-plugin-android-tv",
     "cordova-plugin-code-push": "^1.12.0",
